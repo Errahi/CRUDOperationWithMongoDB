@@ -10,5 +10,7 @@ namespace CRUDOperationWithMongoDB.DataAccessLayer
 		public Task<GetRecordByNameResponse> GetRecordByName(string Name);
 		public Task<UpdateRecordByIdResponse> UpdateRecordById(InsertRecordRequest request);
 		public Task<UpdateAgeByIdResponse> UpdateAgeById(UpdateAgeByIdRequest request);
+		public Task<DeleteRecordByIdResponse> DeleteRecordById(DeleteRecordByIdRequest request);
+		public Task<DeleteAllRecordsResponse> DeleteAllRecords();
 	}
 }

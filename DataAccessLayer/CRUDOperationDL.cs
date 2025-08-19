@@ -17,6 +17,51 @@ namespace CRUDOperationWithMongoDB.DataAccessLayer
 			_mongoCollection = _mongoDatabase.GetCollection<InsertRecordRequest>(_configuration[key: "DatabaseSettings:CollectionName"]);
 		}
 
+		public async Task<DeleteRecordByIdResponse> DeleteRecordById(DeleteRecordByIdRequest request)
+		{
+			DeleteRecordByIdResponse response = new DeleteRecordByIdResponse();
+			response.IsSuccess = true;
+			response.Message = "Delete record successfully!";
+
+			try
+			{
+				var result = await _mongoCollection.DeleteOneAsync(x => x.Id == request.Id);
+				if (!result.IsAcknowledged)
+				{
+					response.IsSuccess = false;
+					response.Message = "No Record found against this id";
+				}
+			}
+			catch (Exception ex)
+			{
+				response.IsSuccess = false;
+				response.Message = "Exception occurs: " + ex.Message;
+			}
+			return response;
+		}
+		public async Task<DeleteAllRecordsResponse> DeleteAllRecords()
+		{
+			DeleteAllRecordsResponse response = new DeleteAllRecordsResponse();
+			response.IsSuccess = true;
+			response.Message = "Delete all records successfully!";
+
+			try
+			{
+				var result = await _mongoCollection.DeleteManyAsync(x => true);
+				if (!result.IsAcknowledged)
+				{
+					response.IsSuccess = false;
+					response.Message = "No Record found";
+				}
+			}
+			catch (Exception ex)
+			{
+				response.IsSuccess = false;
+				response.Message = "Exception occurs: " + ex.Message;
+			}
+			return response;
+		}
+
 		public async Task<GetAllRecordsResponse> GetAllRecords()
 		{
 			GetAllRecordsResponse response = new GetAllRecordsResponse();
@@ -25,13 +70,13 @@ namespace CRUDOperationWithMongoDB.DataAccessLayer
 			try
 			{
 				response.data = new List<InsertRecordRequest>();
-				response.data = await _mongoCollection.Find(x=>true).ToListAsync();
-				if(response.data.Count==0)
+				response.data = await _mongoCollection.Find(x => true).ToListAsync();
+				if (response.data.Count == 0)
 				{
 					response.Message = "No record found";
 				}
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				response.IsSuccess = false;
 				response.Message = "Exception occurs: " + ex.Message;
@@ -41,12 +86,12 @@ namespace CRUDOperationWithMongoDB.DataAccessLayer
 
 		public async Task<GetRecordByIdResponse> GetRecordById(string ID)
 		{
-			GetRecordByIdResponse response= new GetRecordByIdResponse();
+			GetRecordByIdResponse response = new GetRecordByIdResponse();
 			response.IsSuccess = true;
 			response.Message = "Fetch Data Successfullly!";
 			try
 			{
-				response.data=await _mongoCollection.Find(x=>x.Id==ID).FirstOrDefaultAsync();
+				response.data = await _mongoCollection.Find(x => x.Id == ID).FirstOrDefaultAsync();
 				if (response.data == null)
 				{
 					response.Message = "Invalid Id";
@@ -54,29 +99,29 @@ namespace CRUDOperationWithMongoDB.DataAccessLayer
 			}
 			catch (Exception ex)
 			{
-				response.IsSuccess= false;
-				response.Message="Exception occurs: " + ex.Message;
+				response.IsSuccess = false;
+				response.Message = "Exception occurs: " + ex.Message;
 			}
 			return response;
 		}
 
 		public async Task<GetRecordByNameResponse> GetRecordByName(string Name)
 		{
-			GetRecordByNameResponse response= new GetRecordByNameResponse();
+			GetRecordByNameResponse response = new GetRecordByNameResponse();
 			response.IsSuccess = true;
 			response.Message = "Fetch Data Successfully by Name!";
 			try
 			{
 				response.data = new List<InsertRecordRequest>();
-				response.data = await _mongoCollection.Find(x=>x.FirstName==Name || x.LastName==Name).ToListAsync();
-				if(response.data == null)
+				response.data = await _mongoCollection.Find(x => x.FirstName == Name || x.LastName == Name).ToListAsync();
+				if (response.data == null)
 				{
 					response.Message = "No record found by this Name";
 				}
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
-				response.IsSuccess=!false;
+				response.IsSuccess = !false;
 				response.Message = "Exception occurs: " + ex.Message;
 			}
 			return response;
@@ -110,9 +155,9 @@ namespace CRUDOperationWithMongoDB.DataAccessLayer
 			response.Message = "Record Updated Successfully!";
 			try
 			{
-				var filter = new BsonDocument().Add("Age",request.Age).Add("UpdateDate",DateTime.Now.ToString());
+				var filter = new BsonDocument().Add("Age", request.Age).Add("UpdateDate", DateTime.Now.ToString());
 
-				var updatedData=new BsonDocument("$set", filter);
+				var updatedData = new BsonDocument("$set", filter);
 				var result = await _mongoCollection.UpdateOneAsync(x => x.Id == request.Id, updatedData);
 				if (!result.IsAcknowledged)
 				{
@@ -136,12 +181,12 @@ namespace CRUDOperationWithMongoDB.DataAccessLayer
 			response.Message = "Record Updated Successfully!";
 			try
 			{
-				GetRecordByIdResponse response1=await GetRecordById(request.Id);
-				request.CreateDate= response1.data.CreateDate;
-				request.UpdateDate= DateTime.Now.ToString();
+				GetRecordByIdResponse response1 = await GetRecordById(request.Id);
+				request.CreateDate = response1.data.CreateDate;
+				request.UpdateDate = DateTime.Now.ToString();
 
-			var result=	await _mongoCollection.ReplaceOneAsync(x => x.Id == request.Id, request);
-				if(!result.IsAcknowledged)
+				var result = await _mongoCollection.ReplaceOneAsync(x => x.Id == request.Id, request);
+				if (!result.IsAcknowledged)
 				{
 					response.IsSuccess = false;
 					response.Message = "No record found against this id";
@@ -151,9 +196,11 @@ namespace CRUDOperationWithMongoDB.DataAccessLayer
 			{
 
 				response.IsSuccess = false;
-				response.Message="Exception occurs: " + response.Message;
+				response.Message = "Exception occurs: " + response.Message;
 			}
 			return response;
 		}
+
+	
 	}
 }
