@@ -1,4 +1,5 @@
 ﻿using CRUDOperationWithMongoDB.Models;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace CRUDOperationWithMongoDB.DataAccessLayer
@@ -99,6 +100,59 @@ namespace CRUDOperationWithMongoDB.DataAccessLayer
 				response.Message = "Exception occurs: " + ex.Message;
 			}
 
+			return response;
+		}
+
+		public async Task<UpdateAgeByIdResponse> UpdateAgeById(UpdateAgeByIdRequest request)
+		{
+			UpdateAgeByIdResponse response = new UpdateAgeByIdResponse();
+			response.IsSuccess = true;
+			response.Message = "Record Updated Successfully!";
+			try
+			{
+				var filter = new BsonDocument().Add("Age",request.Age).Add("UpdateDate",DateTime.Now.ToString());
+
+				var updatedData=new BsonDocument("$set", filter);
+				var result = await _mongoCollection.UpdateOneAsync(x => x.Id == request.Id, updatedData);
+				if (!result.IsAcknowledged)
+				{
+					response.IsSuccess = false;
+					response.Message = "No record found against this id";
+				}
+			}
+			catch
+			{
+
+				response.IsSuccess = false;
+				response.Message = "Exception occurs: " + response.Message;
+			}
+			return response;
+		}
+
+		public async Task<UpdateRecordByIdResponse> UpdateRecordById(InsertRecordRequest request)
+		{
+			UpdateRecordByIdResponse response = new UpdateRecordByIdResponse();
+			response.IsSuccess = true;
+			response.Message = "Record Updated Successfully!";
+			try
+			{
+				GetRecordByIdResponse response1=await GetRecordById(request.Id);
+				request.CreateDate= response1.data.CreateDate;
+				request.UpdateDate= DateTime.Now.ToString();
+
+			var result=	await _mongoCollection.ReplaceOneAsync(x => x.Id == request.Id, request);
+				if(!result.IsAcknowledged)
+				{
+					response.IsSuccess = false;
+					response.Message = "No record found against this id";
+				}
+			}
+			catch
+			{
+
+				response.IsSuccess = false;
+				response.Message="Exception occurs: " + response.Message;
+			}
 			return response;
 		}
 	}

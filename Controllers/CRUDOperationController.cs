@@ -13,7 +13,7 @@ namespace CRUDOperationWithMongoDB.Controllers
 
 		public CRUDOperationController(ICRUDOperationDL cRUDOperationDL)
 		{
-			_crudOperationDL = cRUDOperationDL;			
+			_crudOperationDL = cRUDOperationDL;
 		}
 
 		[HttpPost]
@@ -22,12 +22,12 @@ namespace CRUDOperationWithMongoDB.Controllers
 			InsertRecordResponse insertRecordResponse = new InsertRecordResponse();
 			try
 			{
-				insertRecordResponse= await _crudOperationDL.InsertRecord(insertRecordRequest);
+				insertRecordResponse = await _crudOperationDL.InsertRecord(insertRecordRequest);
 			}
 			catch (Exception ex)
 			{
 				insertRecordResponse.IsSuccess = false;
-				insertRecordResponse.Message="Exception occurs" + ex.Message;
+				insertRecordResponse.Message = "Exception occurs" + ex.Message;
 			}
 
 			return Ok(insertRecordResponse);
@@ -52,7 +52,7 @@ namespace CRUDOperationWithMongoDB.Controllers
 
 
 		[HttpGet]
-		public async Task<IActionResult> GetRecordById([FromQuery]string id)
+		public async Task<IActionResult> GetRecordById([FromQuery] string id)
 		{
 			GetRecordByIdResponse getByIdRecordResponse = new GetRecordByIdResponse();
 			try
@@ -83,6 +83,40 @@ namespace CRUDOperationWithMongoDB.Controllers
 			}
 
 			return Ok(getByNameRecordResponse);
+		}
+
+		[HttpPut]
+		public async Task<IActionResult> UpdateRecordById(InsertRecordRequest request)
+		{
+			UpdateRecordByIdResponse updateByIdRecordResponse = new UpdateRecordByIdResponse();
+			try
+			{
+				updateByIdRecordResponse = await _crudOperationDL.UpdateRecordById(request);
+			}
+			catch (Exception ex)
+			{
+				updateByIdRecordResponse.IsSuccess = false;
+				updateByIdRecordResponse.Message = "Exception occurs" + ex.Message;
+			}
+
+			return Ok(updateByIdRecordResponse);
+		}
+
+		[HttpPatch]
+		public async Task<IActionResult> UpdateAgeById(UpdateAgeByIdRequest request)
+		{
+			UpdateAgeByIdResponse updateAgeByIdRecordResponse = new UpdateAgeByIdResponse();
+			try
+			{
+				updateAgeByIdRecordResponse = await _crudOperationDL.UpdateAgeById(request);
+			}
+			catch (Exception ex)
+			{
+				updateAgeByIdRecordResponse.IsSuccess = false;
+				updateAgeByIdRecordResponse.Message = "Exception occurs" + ex.Message;
+			}
+
+			return Ok(updateAgeByIdRecordResponse);
 		}
 	}
 }
