@@ -118,5 +118,38 @@ namespace CRUDOperationWithMongoDB.Controllers
 
 			return Ok(updateAgeByIdRecordResponse);
 		}
+		[HttpDelete]
+		public async Task<IActionResult> DeleteRecordById(DeleteRecordByIdRequest request)
+		{
+			DeleteRecordByIdResponse response = new DeleteRecordByIdResponse();
+			try
+			{
+				response = await _crudOperationDL.DeleteRecordById(request);
+			}
+			catch (Exception ex)
+			{
+				response.IsSuccess = false;
+				response.Message = "Exception occurs" + ex.Message;
+			}
+
+			return Ok(response);
+		}
+
+		[HttpDelete]
+		public async Task<IActionResult> DeleteAllRecords()
+		{
+			DeleteAllRecordsResponse response = new DeleteAllRecordsResponse();
+			try
+			{
+				response = await _crudOperationDL.DeleteAllRecords();
+			}
+			catch (Exception ex)
+			{
+				response.IsSuccess = false;
+				response.Message = "Exception occurs" + ex.Message;
+			}
+
+			return Ok(response);
+		}
 	}
 }
